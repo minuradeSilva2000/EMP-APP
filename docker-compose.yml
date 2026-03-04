@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  # Backend Service
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: employee-api
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - JWT_SECRET=your-secret-key-change-in-production
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-76679338484-tcgot7q5fqnksr4465r58kkk6l7pg6uf.apps.googleusercontent.com}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET:-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}
+      - REDIRECT_URI=${REDIRECT_URI:-http://localhost/oauth}
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/employees"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - employee-network
+
+  # Frontend Service
+  frontend:
+    build:
+      context: ./ts-dashboard
+      dockerfile: Dockerfile
+    container_name: employee-frontend
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - api
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - employee-network
+
+  # Database (Optional - for future use)
+  # database:
+  #   image: postgres:15-alpine
+  #   container_name: employee-db
+  #   environment:
+  #     POSTGRES_DB: employee_management
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   ports:
+  #     - "5432:5432"
+  #   restart: unless-stopped
+  #   networks:
+  #     - employee-network
+
+networks:
+  employee-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+  logs:
+    driver: local

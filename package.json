@@ -1,0 +1,31 @@
+{
+  "name": "new-employee",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "start:all": "concurrently \"npm start\" \"cd ts-dashboard && npm run dev -- --host\"",
+    "dev": "concurrently \"npm start\" \"cd ts-dashboard && npm run dev -- --host\"",
+    "auto": "auto-start.bat",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "docker:clean": "docker-compose down -v --rmi all"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "googleapis": "^171.4.0",
+    "jsonwebtoken": "^9.0.3"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
